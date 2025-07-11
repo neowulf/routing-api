@@ -150,7 +150,7 @@ var _ = Describe("Client", func() {
 		)
 		BeforeEach(func() {
 			tcpRouteMapping1 = models.NewTcpRouteMapping("router-group-guid-001", 52000, "1.2.3.4", 60000, 60002, "", nil, 60, models.ModificationTag{}, false, "")
-			tcpRouteMapping2 = models.NewTcpRouteMapping("router-group-guid-001", 52001, "1.2.3.5", 60001, 60003, "", nil, 60, models.ModificationTag{}, false, "")
+			tcpRouteMapping2 = models.NewTcpRouteMapping("router-group-guid-001", 52001, "1.2.3.5", 60001, 60003, "", nil, 60, models.ModificationTag{}, true, "alpn1,alpn2")
 		})
 
 		JustBeforeEach(func() {
@@ -532,7 +532,7 @@ var _ = Describe("Client", func() {
 		)
 		BeforeEach(func() {
 			tcpRouteMapping1 = models.NewTcpRouteMapping("router-group-guid-001", 52000, "1.2.3.4", 60000, 60002, "", nil, 60, models.ModificationTag{}, false, "")
-			tcpRouteMapping2 = models.NewTcpRouteMapping("router-group-guid-001", 52001, "1.2.3.5", 60001, 60003, "", nil, 60, models.ModificationTag{}, false, "")
+			tcpRouteMapping2 = models.NewTcpRouteMapping("router-group-guid-001", 52001, "1.2.3.5", 60001, 60003, "", nil, 60, models.ModificationTag{}, true, "alpn1,alpn2")
 		})
 
 		Context("when the server returns a valid response", func() {
@@ -1118,7 +1118,7 @@ var _ = Describe("Client", func() {
 		)
 
 		BeforeEach(func() {
-			tcpRoute1 = models.NewTcpRouteMapping("rguid1", 52000, "1.1.1.1", 60000, 60002, "", nil, 60, models.ModificationTag{}, false, "")
+			tcpRoute1 = models.NewTcpRouteMapping("rguid1", 52000, "1.1.1.1", 60000, 60002, "", nil, 60, models.ModificationTag{}, false, "alpn1,alpn2")
 
 			data, _ := json.Marshal(tcpRoute1)
 			event = sse.Event{
