@@ -934,9 +934,7 @@ var _ = Describe("SqlDB", func() {
 					err := sqlDB.SaveTcpRouteMapping(tcpRoute)
 					Expect(err).ToNot(HaveOccurred())
 
-					var dbTcpRoute models.TcpRouteMapping
-					err = sqlDB.Client.Where("host_ip = ?", "127.0.0.1").First(&dbTcpRoute)
-					Expect(err).ToNot(HaveOccurred())
+					dbTcpRoute := getFirstTCPRouteMapping(sqlDB, "127.0.0.1")
 					Expect(dbTcpRoute).To(matchers.MatchTcpRoute(tcpRoute))
 				})
 			})
