@@ -907,19 +907,14 @@ var _ = Describe("SqlDB", func() {
 
 				Context("and the update is a no-op", func() {
 					It("updates the expiry using the previous TTL", func() {
-						var dbTcpRoute models.TcpRouteMapping
-						err = sqlDB.Client.Where("host_ip = ?", "127.0.0.1").First(&dbTcpRoute)
-						Expect(err).ToNot(HaveOccurred())
-						Expect(dbTcpRoute).ToNot(BeNil())
+						dbTcpRoute := getFirstTCPRouteMapping(sqlDB, "127.0.0.1")
 						initialExpiration := dbTcpRoute.ExpiresAt
 						time.Sleep(1 * time.Second)
 
 						err := sqlDB.SaveTcpRouteMapping(tcpRoute)
 						Expect(err).ToNot(HaveOccurred())
 
-						err = sqlDB.Client.Where("host_ip = ?", "127.0.0.1").First(&dbTcpRoute)
-						Expect(err).ToNot(HaveOccurred())
-						Expect(dbTcpRoute).ToNot(BeNil())
+						dbTcpRoute = getFirstTCPRouteMapping(sqlDB, "127.0.0.1")
 						Expect(initialExpiration).To(BeTemporally("<", dbTcpRoute.ExpiresAt))
 					})
 				})
@@ -929,9 +924,8 @@ var _ = Describe("SqlDB", func() {
 				It("creates a modification tag", func() {
 					err := sqlDB.SaveTcpRouteMapping(tcpRoute)
 					Expect(err).ToNot(HaveOccurred())
-					var dbTcpRoute models.TcpRouteMapping
-					err = sqlDB.Client.Where("host_ip = ?", "127.0.0.1").First(&dbTcpRoute)
-					Expect(err).ToNot(HaveOccurred())
+
+					dbTcpRoute := getFirstTCPRouteMapping(sqlDB, "127.0.0.1")
 					Expect(dbTcpRoute.ModificationTag.Guid).ToNot(BeEmpty())
 					Expect(dbTcpRoute.ModificationTag.Index).To(BeZero())
 				})
@@ -939,6 +933,7 @@ var _ = Describe("SqlDB", func() {
 				It("creates a tcp route", func() {
 					err := sqlDB.SaveTcpRouteMapping(tcpRoute)
 					Expect(err).ToNot(HaveOccurred())
+
 					var dbTcpRoute models.TcpRouteMapping
 					err = sqlDB.Client.Where("host_ip = ?", "127.0.0.1").First(&dbTcpRoute)
 					Expect(err).ToNot(HaveOccurred())
