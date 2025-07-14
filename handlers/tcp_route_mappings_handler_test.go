@@ -92,6 +92,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 					})
 				})
 			})
+
 			Context("when an isolation segment is present", func() {
 				It("sets the isolation segment", func() {
 					tcpMapping := models.TcpRouteMapping{
@@ -348,7 +349,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 
 			BeforeEach(func() {
 				mapping1 := models.NewTcpRouteMapping("router-group-guid-001", 52000, "1.2.3.4", 60000, 60002, "instanceId", nil, 55, models.ModificationTag{}, false, "")
-				mapping2 := models.NewTcpRouteMapping("router-group-guid-001", 52001, "1.2.3.5", 60001, 60003, "instanceId", nil, 55, models.ModificationTag{}, false, "")
+				mapping2 := models.NewTcpRouteMapping("router-group-guid-001", 52001, "1.2.3.5", 60001, 60003, "instanceId", nil, 55, models.ModificationTag{}, true, "alpn1,alpn2")
 				tcpRoutes = []models.TcpRouteMapping{mapping1, mapping2}
 				database.ReadTcpRouteMappingsReturns(tcpRoutes, nil)
 			})
@@ -386,7 +387,9 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 									"index": 0
 								},
 								"ttl": 55,
-								"isolation_segment": ""
+								"isolation_segment": "",
+								"terminate_frontend_tls": true,
+								"alpn": "alpn1,alpn2"
 							}]`
 				Expect(responseRecorder.Body.String()).To(MatchJSON(expectedJson))
 			})
@@ -397,7 +400,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 
 			BeforeEach(func() {
 				mapping1 := models.NewTcpRouteMapping("router-group-guid-001", 52000, "1.2.3.4", 60000, 60002, "instanceId", nil, 55, models.ModificationTag{}, false, "")
-				mapping2 := models.NewTcpRouteMapping("router-group-guid-001", 52001, "1.2.3.5", 60001, 60003, "instanceId", nil, 55, models.ModificationTag{}, false, "")
+				mapping2 := models.NewTcpRouteMapping("router-group-guid-001", 52001, "1.2.3.5", 60001, 60003, "instanceId", nil, 55, models.ModificationTag{}, true, "alpn1,alpn2")
 				mapping2.IsolationSegment = "is1"
 				tcpRoutes = []models.TcpRouteMapping{mapping1, mapping2}
 				database.ReadFilteredTcpRouteMappingsReturns(tcpRoutes, nil)
@@ -444,7 +447,9 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 									"index": 0
 								},
 								"ttl": 55,
-								"isolation_segment": "is1"
+								"isolation_segment": "is1",
+								"terminate_frontend_tls": true,
+								"alpn": "alpn1,alpn2"
 							}]`
 				Expect(responseRecorder.Body.String()).To(MatchJSON(expectedJson))
 			})
@@ -488,7 +493,9 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 									"index": 0
 								},
 								"ttl": 55,
-								"isolation_segment": "is1"
+								"isolation_segment": "is1",
+								"terminate_frontend_tls": true,
+								"alpn": "alpn1,alpn2"
 							}]`
 				Expect(responseRecorder.Body.String()).To(MatchJSON(expectedJson))
 			})
@@ -499,7 +506,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 
 			BeforeEach(func() {
 				mapping1 := models.NewTcpRouteMapping("router-group-guid-001", 52000, "1.2.3.4", 60000, 60002, "instanceId", nil, 55, models.ModificationTag{}, false, "")
-				mapping2 := models.NewTcpRouteMapping("router-group-guid-001", 52001, "1.2.3.5", 60001, 60003, "instanceId", nil, 55, models.ModificationTag{}, false, "")
+				mapping2 := models.NewTcpRouteMapping("router-group-guid-001", 52001, "1.2.3.5", 60001, 60003, "instanceId", nil, 55, models.ModificationTag{}, true, "alpn1,alpn2")
 				mapping2.IsolationSegment = "is1"
 				tcpRoutes = []models.TcpRouteMapping{mapping1, mapping2}
 				database.ReadTcpRouteMappingsReturns(tcpRoutes, nil)
@@ -541,7 +548,9 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 									"index": 0
 								},
 								"ttl": 55,
-								"isolation_segment": "is1"
+								"isolation_segment": "is1",
+								"terminate_frontend_tls": true,
+								"alpn": "alpn1,alpn2"
 							}]`
 				Expect(responseRecorder.Body.String()).To(MatchJSON(expectedJson))
 			})
@@ -565,6 +574,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 			BeforeEach(func() {
 				database.ReadTcpRouteMappingsReturns(nil, errors.New("something bad"))
 			})
+
 			It("returns internal server error", func() {
 				request = handlers.NewTestRequest("")
 				tcpRouteMappingsHandler.List(responseRecorder, request)
@@ -598,7 +608,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 			)
 
 			BeforeEach(func() {
-				tcpMapping = models.NewTcpRouteMapping("router-group-guid-002", 52001, "1.2.3.4", 60000, 60002, "instanceId", nil, 60, models.ModificationTag{}, false, "")
+				tcpMapping = models.NewTcpRouteMapping("router-group-guid-002", 52001, "1.2.3.4", 60000, 60002, "instanceId", nil, 60, models.ModificationTag{}, false, "alpn1,alpn2")
 				tcpMappings = []models.TcpRouteMapping{tcpMapping}
 			})
 
@@ -647,6 +657,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 						"modification_tag":  map[string]interface{}{"guid": "", "index": float64(0)},
 						"ttl":               float64(60),
 						"isolation_segment": "",
+						"alpn":              "alpn1,alpn2",
 					}
 					logData := map[string][]interface{}{"tcp_mapping_deletion": {data}}
 
