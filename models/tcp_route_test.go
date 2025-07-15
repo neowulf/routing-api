@@ -105,6 +105,26 @@ var _ = Describe("TCP Route", func() {
 					Expect(tcpRouteMapping2.Matches(tcpRouteMapping)).To(BeFalse())
 				})
 			})
+
+			Context("when two routes have different", func() {
+				It("TerminateFrontendTLS that are not equal", func() {
+					tcpRouteMapping2.TerminateFrontendTLS = true
+					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeFalse())
+
+					By("resetting")
+					tcpRouteMapping2.TerminateFrontendTLS = tcpRouteMapping.TerminateFrontendTLS
+					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeTrue())
+				})
+
+				It("ALPNs that are not equal", func() {
+					tcpRouteMapping2.ALPN = "alpn1,alpn2"
+					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeFalse())
+
+					By("resetting")
+					tcpRouteMapping2.ALPN = tcpRouteMapping.ALPN
+					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeTrue())
+				})
+			})
 		})
 	})
 })
