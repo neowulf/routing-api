@@ -107,6 +107,11 @@ var _ = Describe("TCP Route", func() {
 			})
 
 			Context("when two routes have different", func() {
+				JustBeforeEach(func() {
+					tcpRouteMapping2.SniHostname = tcpRouteMapping.SniHostname
+					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeTrue())
+				})
+
 				It("TerminateFrontendTLS that are not equal", func() {
 					tcpRouteMapping2.TerminateFrontendTLS = true
 					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeFalse())
