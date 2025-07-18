@@ -33,7 +33,7 @@ type TcpMappingEntity struct {
 	TTL                  *int   `json:"ttl,omitempty"`
 	IsolationSegment     string `json:"isolation_segment"`
 	TerminateFrontendTLS bool   `gorm:"default:false" json:"terminate_frontend_tls,omitempty"`
-	ALPN                 string `json:"alpn,omitempty"`
+	ALPNs                string `json:"alpns,omitempty"`
 }
 
 func (TcpRouteMapping) TableName() string {
@@ -54,7 +54,7 @@ func NewTcpRouteMappingWithModel(tcpMapping TcpRouteMapping) (TcpRouteMapping, e
 	}, nil
 }
 
-func NewTcpRouteMapping(routerGroupGuid string, externalPort uint16, hostIP string, hostPort uint16, hostTlsPort int, instanceId string, sniHostname *string, ttl int, modTag ModificationTag, terminateFrontendTLS bool, alpn string) TcpRouteMapping {
+func NewTcpRouteMapping(routerGroupGuid string, externalPort uint16, hostIP string, hostPort uint16, hostTlsPort int, instanceId string, sniHostname *string, ttl int, modTag ModificationTag, terminateFrontendTLS bool, alpns string) TcpRouteMapping {
 	mapping := TcpRouteMapping{
 		TcpMappingEntity: TcpMappingEntity{
 			RouterGroupGuid:      routerGroupGuid,
@@ -67,7 +67,7 @@ func NewTcpRouteMapping(routerGroupGuid string, externalPort uint16, hostIP stri
 			TTL:                  &ttl,
 			ModificationTag:      modTag,
 			TerminateFrontendTLS: terminateFrontendTLS,
-			ALPN:                 alpn,
+			ALPNs:                alpns,
 		},
 	}
 	return mapping
@@ -96,7 +96,7 @@ func (m TcpRouteMapping) Matches(other TcpRouteMapping) bool {
 	sameSniHostname := nilSniHostname || sameSniHostnamePointer || sameSniHostnameValue
 
 	sameTerminateFrontendTLS := m.TerminateFrontendTLS == other.TerminateFrontendTLS
-	sameALPN := m.ALPN == other.ALPN
+	sameALPN := m.ALPNs == other.ALPNs
 
 	return sameRouterGroupGuid &&
 		sameExternalPort &&

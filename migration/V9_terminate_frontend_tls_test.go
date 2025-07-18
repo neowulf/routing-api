@@ -44,7 +44,7 @@ var _ = Describe("V9TerminateFrontendTLS", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(HaveLen(1))
 				Expect(routes[0].TerminateFrontendTLS).To(Equal(false))
-				Expect(routes[0].ALPN).To(Equal(""))
+				Expect(routes[0].ALPNs).To(Equal(""))
 			})
 		})
 		Context("After migration", func() {
@@ -70,7 +70,7 @@ var _ = Describe("V9TerminateFrontendTLS", func() {
 						TTL:                  nil,
 						IsolationSegment:     "",
 						TerminateFrontendTLS: false,
-						ALPN:                 "",
+						ALPNs:                "",
 					},
 				}
 				_, err = sqlDB.Client.Create(&tcpRoute1)
@@ -137,7 +137,7 @@ var _ = Describe("V9TerminateFrontendTLS", func() {
 						TTL:                  nil,
 						IsolationSegment:     "",
 						TerminateFrontendTLS: false,
-						ALPN:                 "",
+						ALPNs:                "",
 					},
 				}
 

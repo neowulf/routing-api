@@ -122,11 +122,11 @@ var _ = Describe("TCP Route", func() {
 				})
 
 				It("ALPNs that are not equal", func() {
-					tcpRouteMapping2.ALPN = "alpn1,alpn2"
+					tcpRouteMapping2.ALPNs = "alpn1,alpn2"
 					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeFalse())
 
 					By("resetting")
-					tcpRouteMapping2.ALPN = tcpRouteMapping.ALPN
+					tcpRouteMapping2.ALPNs = tcpRouteMapping.ALPNs
 					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeTrue())
 				})
 			})
