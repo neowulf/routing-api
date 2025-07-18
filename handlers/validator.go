@@ -209,5 +209,11 @@ func validateTcpRouteMapping(tcpRouteMapping models.TcpRouteMapping, checkTTL bo
 		return &err
 	}
 
+	if tcpRouteMapping.ALPNs != "" && !tcpRouteMapping.TerminateFrontendTLS {
+		err := routing_api.NewError(routing_api.TcpRouteMappingInvalidError,
+			"Each tcp mapping can define ALPNs only when TerminateFrontendTLS is enabled. RouteMapping=["+tcpRouteMapping.String()+"]")
+		return &err
+	}
+
 	return nil
 }

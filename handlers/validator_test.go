@@ -314,6 +314,14 @@ var _ = Describe("Validator", func() {
 				Expect(err.Type).To(Equal(routing_api.TcpRouteMappingInvalidError))
 				Expect(err.Error()).To(ContainSubstring("Each tcp route mapping requires a ttl greater than 0"))
 			})
+
+			It("blows up when TerminateFrontendTLS is disabled and ALPNs are defined", func() {
+				tcpMapping.ALPNs = "alpn1,alpn2"
+				err := validator.ValidateCreateTcpRouteMapping([]models.TcpRouteMapping{tcpMapping}, routerGroups, 120)
+				Expect(err).ToNot(BeNil())
+				Expect(err.Type).To(Equal(routing_api.TcpRouteMappingInvalidError))
+				Expect(err.Error()).To(ContainSubstring("Each tcp mapping can define ALPNs only when TerminateFrontendTLS is enabled."))
+			})
 		})
 	})
 
