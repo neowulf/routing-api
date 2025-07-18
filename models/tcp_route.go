@@ -54,7 +54,19 @@ func NewTcpRouteMappingWithModel(tcpMapping TcpRouteMapping) (TcpRouteMapping, e
 	}, nil
 }
 
-func NewTcpRouteMapping(routerGroupGuid string, externalPort uint16, hostIP string, hostPort uint16, hostTlsPort int, instanceId string, sniHostname *string, ttl int, modTag ModificationTag, terminateFrontendTLS bool, alpns string) TcpRouteMapping {
+func NewTcpRouteMapping(
+	routerGroupGuid string,
+	externalPort uint16,
+	hostIP string,
+	hostPort uint16,
+	hostTlsPort int,
+	instanceId string,
+	sniHostname *string,
+	ttl int,
+	modTag ModificationTag,
+	terminateFrontendTLS bool,
+	alpns string,
+) TcpRouteMapping {
 	mapping := TcpRouteMapping{
 		TcpMappingEntity: TcpMappingEntity{
 			RouterGroupGuid:      routerGroupGuid,
