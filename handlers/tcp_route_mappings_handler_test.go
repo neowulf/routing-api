@@ -389,7 +389,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 								"ttl": 55,
 								"isolation_segment": "",
 								"terminate_frontend_tls": true,
-								"alpn": "alpn1,alpn2"
+								"alpns": "alpn1,alpn2"
 							}]`
 				Expect(responseRecorder.Body.String()).To(MatchJSON(expectedJson))
 			})
@@ -449,7 +449,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 								"ttl": 55,
 								"isolation_segment": "is1",
 								"terminate_frontend_tls": true,
-								"alpn": "alpn1,alpn2"
+								"alpns": "alpn1,alpn2"
 							}]`
 				Expect(responseRecorder.Body.String()).To(MatchJSON(expectedJson))
 			})
@@ -495,7 +495,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 								"ttl": 55,
 								"isolation_segment": "is1",
 								"terminate_frontend_tls": true,
-								"alpn": "alpn1,alpn2"
+								"alpns": "alpn1,alpn2"
 							}]`
 				Expect(responseRecorder.Body.String()).To(MatchJSON(expectedJson))
 			})
@@ -550,7 +550,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 								"ttl": 55,
 								"isolation_segment": "is1",
 								"terminate_frontend_tls": true,
-								"alpn": "alpn1,alpn2"
+								"alpns": "alpn1,alpn2"
 							}]`
 				Expect(responseRecorder.Body.String()).To(MatchJSON(expectedJson))
 			})
@@ -657,7 +657,7 @@ var _ = Describe("TcpRouteMappingsHandler", func() {
 						"modification_tag":  map[string]interface{}{"guid": "", "index": float64(0)},
 						"ttl":               float64(60),
 						"isolation_segment": "",
-						"alpn":              "alpn1,alpn2",
+						"alpns":             "alpn1,alpn2",
 					}
 					logData := map[string][]interface{}{"tcp_mapping_deletion": {data}}
 
