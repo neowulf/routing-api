@@ -48,13 +48,15 @@ var _ = Describe("V9TerminateFrontendTLS", func() {
 			})
 		})
 		Context("After migration", func() {
+			var tcpRoute1 models.TcpRouteMapping
+
 			BeforeEach(func() {
 				v9Migration := migration.NewV9TerminateFrontendTLS()
 				err := v9Migration.Run(sqlDB)
 				Expect(err).ToNot(HaveOccurred())
 
 				sniHostname1 := "sniHostname1"
-				tcpRoute1 := models.TcpRouteMapping{
+				tcpRoute1 = models.TcpRouteMapping{
 					Model:     models.Model{Guid: "guid-1"},
 					ExpiresAt: time.Now().Add(1 * time.Hour),
 					TcpMappingEntity: models.TcpMappingEntity{
@@ -73,14 +75,17 @@ var _ = Describe("V9TerminateFrontendTLS", func() {
 						ALPNs:                "",
 					},
 				}
-				_, err = sqlDB.Client.Create(&tcpRoute1)
+			})
+
+			It("expect no error to occur", func() {
+				_, err := sqlDB.Client.Create(&tcpRoute1)
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 	}
 
 	Describe("Version", func() {
-		It("returns 7 for the version", func() {
+		It("returns 9 for the version", func() {
 			v9Migration := migration.NewV9TerminateFrontendTLS()
 			Expect(v9Migration.Version()).To(Equal(9))
 		})

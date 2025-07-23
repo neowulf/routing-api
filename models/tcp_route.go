@@ -107,9 +107,6 @@ func (m TcpRouteMapping) Matches(other TcpRouteMapping) bool {
 	sameSniHostnameValue := m.SniHostname != nil && other.SniHostname != nil && *m.SniHostname == *other.SniHostname
 	sameSniHostname := nilSniHostname || sameSniHostnamePointer || sameSniHostnameValue
 
-	sameTerminateFrontendTLS := m.TerminateFrontendTLS == other.TerminateFrontendTLS
-	sameALPN := m.ALPNs == other.ALPNs
-
 	return sameRouterGroupGuid &&
 		sameExternalPort &&
 		sameHostIP &&
@@ -117,9 +114,7 @@ func (m TcpRouteMapping) Matches(other TcpRouteMapping) bool {
 		sameInstanceId &&
 		sameTTL &&
 		sameHostTLSPort &&
-		sameSniHostname &&
-		sameTerminateFrontendTLS &&
-		sameALPN
+		sameSniHostname
 }
 
 func (t *TcpRouteMapping) SetDefaults(maxTTL int) {
