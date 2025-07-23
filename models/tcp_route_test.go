@@ -106,27 +106,28 @@ var _ = Describe("TCP Route", func() {
 				})
 			})
 
-			Context("when two routes have different", func() {
+			Context("when two routes are equal and TerminateFrontendTLS are different", func() {
 				JustBeforeEach(func() {
 					tcpRouteMapping2.SniHostname = tcpRouteMapping.SniHostname
 					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeTrue())
 				})
 
-				It("TerminateFrontendTLS that are not equal", func() {
+				It("matches()", func() {
+					tcpRouteMapping.TerminateFrontendTLS = false
 					tcpRouteMapping2.TerminateFrontendTLS = true
-					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeFalse())
+					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeTrue())
+				})
+			})
 
-					By("resetting")
-					tcpRouteMapping2.TerminateFrontendTLS = tcpRouteMapping.TerminateFrontendTLS
+			Context("when two routes are equal and ALPNs are different", func() {
+				JustBeforeEach(func() {
+					tcpRouteMapping2.SniHostname = tcpRouteMapping.SniHostname
 					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeTrue())
 				})
 
-				It("ALPNs that are not equal", func() {
+				It("matches()", func() {
+					tcpRouteMapping.ALPNs = ""
 					tcpRouteMapping2.ALPNs = "alpn1,alpn2"
-					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeFalse())
-
-					By("resetting")
-					tcpRouteMapping2.ALPNs = tcpRouteMapping.ALPNs
 					Expect(tcpRouteMapping.Matches(tcpRouteMapping2)).To(BeTrue())
 				})
 			})
