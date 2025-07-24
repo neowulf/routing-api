@@ -138,7 +138,7 @@ var _ = Describe("SqlDB", func() {
 				cfg = &config.SqlDB{
 					Username: "root",
 					Password: "password",
-					Host:     "localhost",
+					Host:     "127.0.0.1",
 					Port:     3306,
 					Type:     "mysql",
 					Schema:   "testDB",
@@ -736,6 +736,69 @@ var _ = Describe("SqlDB", func() {
 	}
 
 	FindExistingTcpRouteMapping := func() {
+		Describe("FilterSimilarTcpRouteMapping", func() {
+			var (
+				sniHostname string
+				tcpRoutes   []models.TcpRouteMapping
+			)
+
+			BeforeEach(func() {
+				// common sniHostname
+				sniHostname = "similar.foobar.com"
+
+				// same sniHostname, same port,
+				tcpRouteOne, err := models.NewTcpRouteMappingWithModel(models.NewTcpRouteMapping(newUuid(), 4056, "127.0.0.1", 2991, 2981, "instance-1", &sniHostname, 5, models.ModificationTag{}, true, "alpn1,alpn2"))
+				Expect(err).NotTo(HaveOccurred())
+
+				tcpRouteTwo, err := models.NewTcpRouteMappingWithModel(models.NewTcpRouteMapping(newUuid(), 4056, "127.0.0.2", 2992, 2982, "instance-1", &sniHostname, 5, models.ModificationTag{}, true, "alpn2"))
+				Expect(err).NotTo(HaveOccurred())
+
+				// different port and disabled terminateFrontendTLS
+				tcpRouteThree, err := models.NewTcpRouteMappingWithModel(models.NewTcpRouteMapping(newUuid(), 4057, "127.0.0.3", 2993, 2983, "instance-1", &sniHostname, 5, models.ModificationTag{}, false, ""))
+				Expect(err).NotTo(HaveOccurred())
+
+				tcpRoutes = []models.TcpRouteMapping{tcpRouteOne, tcpRouteTwo, tcpRouteThree}
+			})
+
+			Context("when records exists", func() {
+				BeforeEach(func() {
+					for _, tcpRoute := range tcpRoutes {
+						fmt.Printf("%#v\n", tcpRoute)
+						_, err := sqlDB.Client.Create(&tcpRoute)
+						Expect(err).NotTo(HaveOccurred())
+					}
+				})
+
+				AfterEach(func() {
+					for _, tcpRoute := range tcpRoutes {
+						rowsAffected, err := sqlDB.Client.Delete(&tcpRoute)
+						Expect(err).NotTo(HaveOccurred())
+						Expect(rowsAffected).To(BeEquivalentTo(1))
+					}
+				})
+
+				It("returns two tcpRouteMapping given the sniHostname and externalPort", func() {
+					routes, err := sqlDB.FindSimilarTcpRouteMappings(sniHostname, 4056)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(routes).To(HaveLen(2))
+					guids := []string{routes[0].Guid, routes[1].Guid}
+					Expect(guids).To(ContainElements(tcpRoutes[0].Guid, tcpRoutes[1].Guid))
+				})
+
+				It("returns one tcpRouteMapping given the sniHostname and different externalPort", func() {
+					routes, err := sqlDB.FindSimilarTcpRouteMappings(sniHostname, 4057)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(routes).To(HaveLen(1))
+					Expect(routes[0].Guid).To(Equal(tcpRoutes[2].Guid))
+				})
+
+				It("returns zero tcpRouteMapping given the non-existing sniHostname and non-existing externalPort", func() {
+					routes, err := sqlDB.FindSimilarTcpRouteMappings("some."+sniHostname, 9999)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(routes).To(HaveLen(0))
+				})
+			})
+		})
 		Describe("FindExistingTcpRouteMapping", func() {
 			var (
 				routerGroupId string
@@ -757,7 +820,6 @@ var _ = Describe("SqlDB", func() {
 			})
 			Context("when the record exists", func() {
 				BeforeEach(func() {
-					models.NewTcpRouteMappingWithModel(tcpRoute)
 					_, err := sqlDB.Client.Create(&tcpRoute)
 					Expect(err).NotTo(HaveOccurred())
 				})
